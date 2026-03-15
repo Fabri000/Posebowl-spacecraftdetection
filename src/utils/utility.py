@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from torchvision.models.detection import fasterrcnn_resnet50_fpn_v2,FasterRCNN_ResNet50_FPN_V2_Weights
 
-def get_labels(path:str, base_path:str="/home/fabri/PoseBowl/SpacecraftDetection/dataset/labels")-> pd.DataFrame:
+def get_labels(path:str, base_path:str="/home/fabri/PoseBowl/SpacecraftDetection")-> pd.DataFrame:
     '''Returns a dataframe with the labels of the dataset expressed in yolo format.
     
     Args:
@@ -19,6 +19,7 @@ def get_labels(path:str, base_path:str="/home/fabri/PoseBowl/SpacecraftDetection
             s = file.read().rstrip()
             tmp = {}
             tmp['class'],tmp['x_center'],tmp['y_center'],tmp['width'],tmp['height'] = s.split(" ")
+            tmp['class'] = int(tmp['class']) + 1
             tmp['image_id'] = f.split(".")[0]
             labels.append(tmp)
 
