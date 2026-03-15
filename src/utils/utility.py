@@ -19,7 +19,7 @@ def get_labels(path:str, base_path:str="/home/fabri/PoseBowl/SpacecraftDetection
             s = file.read().rstrip()
             tmp = {}
             tmp['class'],tmp['x_center'],tmp['y_center'],tmp['width'],tmp['height'] = s.split(" ")
-            tmp['class'] = int(tmp['class']) + 1
+            tmp['class'] = int(tmp['class']) + 1 # 0 is associatd with background even though it is not detected in the dataset.
             tmp['image_id'] = f.split(".")[0]
             labels.append(tmp)
 

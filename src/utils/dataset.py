@@ -26,8 +26,8 @@ class SpacecraftDataset(Dataset):
         boxes = torch.tensor([[e['x_min'], e['y_min'], e['x_max'], e['y_max']]], dtype=torch.int64)
         labels = torch.tensor([int(e['class'])], dtype=torch.int64)
         img_id = torch.tensor(idx, dtype=torch.int64)
-        area = (e['x_max'] - e['x_min']) * (e['y_max'] - e['y_min'])
+        area = torch.tensor((e['x_max'] - e['x_min']) * (e['y_max'] - e['y_min']), dtype=torch.int64)
 
         target = {'boxes': boxes, 'labels': labels, 'image_id': img_id, 'area': area}
 
-        return torch.tensor(img).permute(2, 0, 1), target
+        return torch.tensor(img).permute(2, 0, 1).float() / 255.0, target
