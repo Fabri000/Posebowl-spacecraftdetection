@@ -52,8 +52,38 @@ def convert_labels_to_pixel(labels_df:pd.DataFrame, image_width:int=1280, image_
 
     return converted_df
 
+def convert_labels_to_yolo(labels_df:pd.DataFrame, image_width:int=1280, image_height:int=1024)-> pd.DataFrame:
+    '''Converts the labels from pixel format to yolo format.
+    
+    Args:
+        labels_df (pd.DataFrame): The dataframe with the labels in pixel format.'''
+    converted_df = pd.DataFrame(columns=['x_center', 'y_center', 'width', 'height', 'image_id'])
+
+    sizes= {
+        'width': labels_df['x_max'] - labels_df['x_min'],
+        'height': labels_df['y_max'] - labels_df['y_min']
+    }
+
+    locations = {
+        'x_center': labels_df['x_min'] + (sizes['width'] / 2),
+        'y_center': labels_df['y_min'] + (sizes['height'] / 2)
+    }
+
+    converted_df['x_center'] = locations['x_center'] / image_width
+    converted_df['y_center'] = locations['y_center'] / image_height
+    converted_df['width'] = sizes['width'] / image_width
+    converted_df['height'] = sizes['height'] / image_height
+    converted_df['image_id'] = labels_df['image_id']
+    converted_df['class'] = labels_df['class']
+
+    return converted_df
 
 def get_model(model_name:str="fasterrcnn_resnet50"):
+    '''Returns a pytorchvision model based on the model name.
+    
+    Args:
+        model_name (str): The name of the model. Default is "fasterrcnn_resnet50".
+    '''
     match model_name:
         case "fasterrcnn_resnet50":
             weights = FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT
