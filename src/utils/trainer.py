@@ -13,7 +13,7 @@ class Trainer:
         for _ in tqdm.tqdm(range(epochs)):
             train_loss = 0.0
             self.model.train()
-            for images, targets in train_dataloader:
+            for images, targets in tqdm.tqdm(train_dataloader):
                 images = list(image.to(self.device) for image in images)
                 targets = [{k: v.to(self.device) for k, v in t.items()} for t in targets]
 
@@ -28,14 +28,14 @@ class Trainer:
                 self.lr_scheduler.step()
             
             eval_loss = 0.0
-            self.model.eval()
-            for images, targets in eval_dataloader:
-                images = list(image.to(self.device) for image in images)
-                targets = [{k: v.to(self.device) for k, v in t.items()} for t in targets]
+            with torch.no_grad():
+                for images, targets in tqdm.tqdm(eval_dataloader):
+                    images = list(image.to(self.device) for image in images)
+                    targets = [{k: v.to(self.device) for k, v in t.items()} for t in targets]
 
-                loss_dict = self.model(images, targets)
-                losses = sum(loss for loss in loss_dict.values())
-                eval_loss += losses.item()
+                    loss_dict = self.model(images, targets)
+                    losses = sum(loss for loss in loss_dict.values())
+                    eval_loss += losses.item()
 
             print(f"Epoch: {_}, Train Loss: {train_loss / len(train_dataloader)}, Eval Loss: {eval_loss / len(eval_dataloader)}")
 
