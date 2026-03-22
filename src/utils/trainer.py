@@ -9,36 +9,48 @@ class Trainer:
         self.device = device
 
     def train(self, train_dataloader:torch.utils.data.DataLoader, eval_dataloader:torch.utils.data.DataLoader, epochs:int = 1):
-        
-        for _ in tqdm.tqdm(range(epochs)):
-            train_loss = 0.0
+        results = {"train": [], "eval": []}
+
+        for epoch in range(epochs):
+            # --- Training Phase ---
             self.model.train()
-            for images, targets in tqdm.tqdm(train_dataloader):
+            train_running_total_loss = 0.0
+            
+            pbar_train = tqdm.tqdm(train_dataloader, desc=f"Epoch {epoch+1} [Train]")
+            for images, targets in pbar_train:
                 images = list(image.to(self.device) for image in images)
                 targets = [{k: v.to(self.device) for k, v in t.items()} for t in targets]
 
                 loss_dict = self.model(images, targets)
                 losses = sum(loss for loss in loss_dict.values())
-                train_loss += losses.item()
-
+                
                 self.optimizer.zero_grad()
                 losses.backward()
                 self.optimizer.step()
 
-                self.lr_scheduler.step()
-            
-            eval_loss = 0.0
+                train_running_total_loss += losses.item()
+                pbar_train.set_postfix(loss=losses.item())
+
+            self.lr_scheduler.step()
+            avg_train_loss = train_running_total_loss / len(train_dataloader)
+
+            eval_running_total_loss = 0.0
+            pbar_eval = tqdm.tqdm(eval_dataloader, desc=f"Epoch {epoch+1} [Eval]")
             with torch.no_grad():
-                for images, targets in tqdm.tqdm(eval_dataloader):
+                for images, targets in pbar_eval:
                     images = list(image.to(self.device) for image in images)
                     targets = [{k: v.to(self.device) for k, v in t.items()} for t in targets]
 
                     loss_dict = self.model(images, targets)
                     losses = sum(loss for loss in loss_dict.values())
-                    eval_loss += losses.item()
+                    
+                    eval_running_total_loss += losses.item()
+                    pbar_eval.set_postfix(loss=losses.item())
 
-            print(f"Epoch: {_}, Train Loss: {train_loss / len(train_dataloader)}, Eval Loss: {eval_loss / len(eval_dataloader)}")
+            avg_eval_loss = eval_running_total_loss / len(eval_dataloader)
+            
+            results["train"].append(avg_train_loss)
+            results["eval"].append(avg_eval_loss)
 
-        return 
-    
+        return results
     
