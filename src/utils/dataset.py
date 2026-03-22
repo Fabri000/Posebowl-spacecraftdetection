@@ -16,6 +16,17 @@ class SpacecraftDataset(Dataset):
         idx = random.randint(0, len(self.labels_df) - 1)
         return self.__getitem__(idx)
     
+    def get_random_samples(self, n:int=1):
+        idxs = random.sample(range(len(self.labels_df)), n)
+        return [self.__getitem__(idx) for idx in idxs]
+    
+    def  get_sample_by_id(self, image_id:str):
+        sample = self.labels_df[self.labels_df['image_id'] == image_id]
+        if sample.empty:
+            raise ValueError(f"No sample found with image_id: {image_id}")
+        idx = sample.index[0]
+        return self.__getitem__(idx)
+    
     def __len__(self):
         return len(self.labels_df)
     
