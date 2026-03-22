@@ -1,5 +1,8 @@
 import os
+import torch
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 from torchvision.models.detection import fasterrcnn_resnet50_fpn_v2,FasterRCNN_ResNet50_FPN_V2_Weights
 
 def get_labels(path:str, base_path:str="/home/fabri/PoseBowl/SpacecraftDetection")-> pd.DataFrame:
@@ -93,3 +96,24 @@ def get_model(model_name:str="fasterrcnn_resnet50"):
             raise ValueError(f"Model {model_name} not supported.")
     return model
 
+def show_img_with_boxes(img: torch.Tensor, bboxes: torch.Tensor):
+    img_array = img.permute(1, 2, 0).cpu().numpy()
+
+    fig, ax = plt.subplots(1)
+    ax.imshow(img_array)
+
+    for box in bboxes:
+        xmin, ymin, xmax, ymax = box
+        
+        width = xmax - xmin
+        height = ymax - ymin
+        
+        rect = patches.Rectangle(
+            (xmin, ymin), width, height, 
+            linewidth=2, edgecolor='r', facecolor='none'
+        )
+        
+        ax.add_patch(rect)
+    
+    plt.axis('off')
+    plt.show()

@@ -1,3 +1,4 @@
+import random
 import pandas as pd
 import torch
 import cv2
@@ -10,6 +11,10 @@ class SpacecraftDataset(Dataset):
 
         self.labels_df = convert_labels_to_pixel(get_labels(f"{base_labels_path}/{set}"))
         self.imgs_path = f"{data_path}/{base_image_path}/{set}"
+    
+    def get_random_sample(self):
+        idx = random.randint(0, len(self.labels_df) - 1)
+        return self.__getitem__(idx)
     
     def __len__(self):
         return len(self.labels_df)
