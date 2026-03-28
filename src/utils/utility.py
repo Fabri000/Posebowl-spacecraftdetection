@@ -92,45 +92,9 @@ def get_model(model_name:str="fasterrcnn_resnet50"):
         case "fasterrcnn_resnet50":
             weights = FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT
             model = fasterrcnn_resnet50_fpn_v2(weights=weights)
+        case "rf_detr":
+            weights = None
+            
         case _:
             raise ValueError(f"Model {model_name} not supported.")
     return model
-
-def intersection_over_union(predicted,original):
-    ''' Evaluate the intersection over union of two rectangles.
-    '''
-    xA = max(predicted[0],original[0])
-    yA = max(predicted[1],original[1])
-    xB = min(predicted[2],original[2])
-    yB = min(predicted[3],original[3])
-
-    inter_area = max(0, xB - xA) * max(0, yB - yA)
-
-    predicted_area = (predicted[2]-predicted[0]) * (predicted[3]-predicted[1])
-    original_area = (original[2]-original[0]) * (original[3]-original[1])
-
-    union_area = predicted_area + original_area - inter_area
-
-    return inter_area / union_area
-
-def show_img_with_boxes(img: torch.Tensor, bboxes: torch.Tensor):
-    img_array = img.permute(1, 2, 0).cpu().numpy()
-
-    fig, ax = plt.subplots(1)
-    ax.imshow(img_array)
-
-    for box in bboxes:
-        xmin, ymin, xmax, ymax = box
-        
-        width = xmax - xmin
-        height = ymax - ymin
-        
-        rect = patches.Rectangle(
-            (xmin, ymin), width, height, 
-            linewidth=2, edgecolor='r', facecolor='none'
-        )
-        
-        ax.add_patch(rect)
-    
-    plt.axis('off')
-    plt.show()
