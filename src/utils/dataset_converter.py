@@ -48,14 +48,11 @@ class DatasetConverter2Coco(DatasetConverter):
         '''Converts the dataset from the original format to the COCO format.'''
         if not os.path.exists(self.converted_dataset_path):
             os.makedirs(self.converted_dataset_path)
-            os.makedirs(f"{self.converted_dataset_path}/images")
-            os.makedirs(f"{self.converted_dataset_path}/annotations")
-
 
         for entry in os.listdir(self.images_path):
             print(f"Processing {entry}...")
             original_image_path = os.path.join(self.images_path, entry)
-            shutil.copytree(original_image_path, f"{self.converted_dataset_path}/images",dirs_exist_ok=True)
+            shutil.copytree(original_image_path, f"{self.converted_dataset_path}/{entry}")
 
             self._convert_labels_to_coco(entry)
 
@@ -63,7 +60,7 @@ class DatasetConverter2Coco(DatasetConverter):
     def _convert_labels_to_coco(self, labels_set:str,images_width:int=1280,images_height:int=1024):
         '''Converts the labels from the original format to the COCO format.'''
 
-        labels_file = f"{labels_set}_labels.json"
+        labels_file = f"_annotations.coco.json"
         
         json_dict = {
                 "images": [],
@@ -102,5 +99,5 @@ class DatasetConverter2Coco(DatasetConverter):
 
                 file.close()
 
-        with open(f"{self.converted_dataset_path}/annotations/{labels_file}", "w") as f:
+        with open(f"{self.converted_dataset_path}/{labels_set}/{labels_file}", "w") as f:
             json.dump(json_dict, f)

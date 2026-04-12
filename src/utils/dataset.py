@@ -9,7 +9,7 @@ from utils.utility import get_labels, convert_labels_to_pixel
 class SpacecraftDataset(Dataset):
     def __init__(self,set:str, base_labels_path:str="dataset/labels", base_image_path:str="dataset/images", data_path:str="/home/fabri/PoseBowl/SpacecraftDetection"):
 
-        self.labels_df = convert_labels_to_pixel(get_labels(f"{base_labels_path}/{set}"))
+        self.labels_df = convert_labels_to_pixel(get_labels(f"{base_labels_path}/{set}", base_path=data_path))
         self.imgs_path = f"{data_path}/{base_image_path}/{set}"
     
     def get_random_sample(self):
