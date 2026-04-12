@@ -82,12 +82,16 @@ def convert_labels_to_yolo(labels_df:pd.DataFrame, image_width:int=1280, image_h
 
     return converted_df
 
-def get_model(model_name:str="fasterrcnn_resnet50"):
+def get_model(model_name:str="fasterrcnn_resnet50",path:str = "D:\\.cache"):
     '''Returns a pytorchvision model based on the model name.
     
     Args:
         model_name (str): The name of the model. Default is "fasterrcnn_resnet50".
+        path (str): The path to the model checkpoints. Default is "D:\\.cache\\checkpoints".
     '''
+
+    torch.hub.set_dir(path)
+
     match model_name:
         case "fasterrcnn_resnet50":
             weights = FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT
